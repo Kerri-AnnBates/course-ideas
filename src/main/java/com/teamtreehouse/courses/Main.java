@@ -13,15 +13,17 @@ import static spark.Spark.*;
 
 public class Main {
     public static void main(String[] args) {
-        staticFileLocation("/public");
+        staticFileLocation("/public"); // Link the css
         CourseIdeaDAO dao = new SimpleCourseIdeaDAO();
 
+        // Middleware: Make cookie available via request attribute. Do for all paths.
         before((req, res) -> {
             if(req.cookie("username") != null) {
                 req.attribute("username", req.cookie("username"));
             }
         });
 
+        // Middleware: check if username cookie is set on the ideas path.
         before("/ideas", (req, res) -> {
             //TODO: send message about redirect.
             if(req.attribute("username") == null) {
@@ -30,6 +32,7 @@ public class Main {
             }
         });
 
+        // Get and display the home page.
         get("/", (req, res) -> {
             Map<String, String> model = new HashMap<>();
             model.put("username", req.attribute("username"));
@@ -37,6 +40,7 @@ public class Main {
             return new ModelAndView(model, "index.hbs");
         }, new HandlebarsTemplateEngine());
 
+        // Sign someone in.
         post("/sign-in", (req, res) -> {
             Map<String, String> model = new HashMap<>();
             String username = req.queryParams("username");
@@ -47,6 +51,7 @@ public class Main {
             return null;
         });
 
+        // List all ideas
         get("/ideas", (req, res) -> {
             Map<String, Object> model = new HashMap<>();
             model.put("ideas", dao.findAll());
@@ -54,6 +59,7 @@ public class Main {
             return new ModelAndView(model, "ideas.hbs");
         }, new HandlebarsTemplateEngine());
 
+        // Add an idea
         post("/ideas", (req, res) -> {
             Map<String, Object> model = new HashMap<>();
             String title = req.queryParams("title");
@@ -63,5 +69,13 @@ public class Main {
 
             return null;
         }, new HandlebarsTemplateEngine());
+
+        // Add a vote count to an idea.
+        post("/ideas/:slug/vote", (req, res) -> {
+            CourseIdea idea = dao.findBySlug(req.params("slug"));
+            idea.addVoter(req.attribute("username"));
+            res.redirect("/ideas");
+            return null;
+        });
     }
 }

@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation 'com.sparkjava:spark-core:2.3'
     implementation 'com.sparkjava:spark-template-handlebars:2.3'
+    implementation 'com.github.slugify:slugify:2.1.4'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
