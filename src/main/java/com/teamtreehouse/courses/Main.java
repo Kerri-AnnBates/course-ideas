@@ -59,6 +59,15 @@ public class Main {
             return new ModelAndView(model, "ideas.hbs");
         }, new HandlebarsTemplateEngine());
 
+        // Get single idea details.
+        get("/ideas/:slug", (req, res) -> {
+            Map<String, Object> model = new HashMap<>();
+            CourseIdea idea = dao.findBySlug(req.params("slug"));
+            model.put("idea", idea);
+
+            return new ModelAndView(model, "idea.hbs");
+        }, new HandlebarsTemplateEngine());
+
         // Add an idea
         post("/ideas", (req, res) -> {
             Map<String, Object> model = new HashMap<>();
